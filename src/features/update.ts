@@ -1,15 +1,6 @@
 import { runCommand } from "../command";
 import { consola } from "consola";
-
-interface UpdateOptions {
-    merge?: boolean;
-    autoUpdate?: boolean;
-    force?: boolean;
-    quiet?: boolean;
-    verbose?: boolean;
-}
-
-export async function handleUpdate(options: UpdateOptions) {
+export async function handleUpdate(options: { merge?: boolean; autoUpdate?: boolean; force?: boolean; quiet?: boolean; verbose?: boolean }) {
     try {
         // Construct the command based on options
         let command = 'brew update';
@@ -34,6 +25,7 @@ export async function handleUpdate(options: UpdateOptions) {
             consola.info(`🔄 Update completed:\n${result}`);
         }
     } catch (error: any) {
-        consola.error(`❌ Error during update: ${error.message}`);
+        consola.error(`Error during update: ${error.message}`);
     }
 }
+

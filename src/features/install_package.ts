@@ -1,15 +1,7 @@
 import { runCommand } from '../command';
 import { consola } from 'consola';
 import ora from 'ora';
-
-interface InstallOptions {
-    quiet?: boolean;
-    force?: boolean;
-    verbose?: boolean;
-    dryRun?: boolean;
-}
-
-export async function handleInstall(packageName: string, options: InstallOptions) {
+export async function handleInstall(packageName: string, options: { quiet?: boolean; force?: boolean; verbose?: boolean; dryRun?: boolean; }) {
     try {
         let command = `brew install ${packageName}`;
         if (options.force) {
@@ -24,23 +16,17 @@ export async function handleInstall(packageName: string, options: InstallOptions
         if (options.quiet) {
             command += ' --quiet';
         }
-
-        const confirmation = await consola.prompt(`Do you want to install the following package: "${packageName}"?`, {
+        const confirmation = await consola.prompt(`Do you want to install the following packages ${packageName}`, {
             type: "confirm",
         });
 
         if (confirmation) {
             const spinner = ora(`🔄 Installing ${packageName}...`).start(); // Start the spinner after confirmation
 
-            try {
-                const result = await runCommand(command);
-                spinner.succeed(`✅ Successfully installed "${packageName}":\n${result}`);
-                if (!options.quiet) {
-                    consola.info(`✅ Successfully installed "${packageName}":\n${result}`);
-                }
-            } catch (installError: any) {
-                spinner.fail(`❌ Failed to install "${packageName}": ${installError.message}`);
-                consola.error(`❌ Error details: ${installError.message}`);
+            const result = await runCommand(command);
+            spinner.succeed(`✅ Successfully installed "${packageName}":\n${result}`);
+            if (!options.quiet) {
+                consola.info(`✅ Successfully installed "${packageName}":\n${result}`);
             }
         } else {
             consola.warn('❌ Installation cancelled.');
@@ -48,6 +34,6 @@ export async function handleInstall(packageName: string, options: InstallOptions
         }
 
     } catch (error: any) {
-        consola.error(`❌ Error during installation process: ${error.message}`);
+        consola.error(`❌ Error installing "${packageName}": ${error.message}`);
     }
 }
